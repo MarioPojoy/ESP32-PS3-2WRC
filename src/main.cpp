@@ -1,12 +1,14 @@
 #include <Arduino.h>
 #include <Ps3Controller.h>
 
-#define PWMA_PIN 16
-#define AIN1_PIN 14
-#define AIN2_PIN 12
-#define PWMB_PIN 27
-#define BIN1_PIN 17
-#define BIN2_PIN 13
+#define PWMA_PIN  GPIO_NUM_16
+#define AIN1_PIN  GPIO_NUM_14
+#define AIN2_PIN  GPIO_NUM_12
+#define PWMB_PIN  GPIO_NUM_27
+#define BIN1_PIN  GPIO_NUM_17
+#define BIN2_PIN  GPIO_NUM_13
+#define ENA_PIN   A0
+#define ENB_PIN   A1
 
 #define motorFreq       15000
 #define motorResolution 8
@@ -29,6 +31,11 @@ void setup()
   pinMode(AIN2_PIN, OUTPUT);
   pinMode(BIN1_PIN, OUTPUT);
   pinMode(BIN2_PIN, OUTPUT);
+  pinMode(ENA_PIN, OUTPUT);
+  pinMode(ENB_PIN, OUTPUT);
+  
+  digitalWrite(ENA_PIN, HIGH);
+  digitalWrite(ENB_PIN, HIGH);
 
   ledcSetup(motorAChannel, motorFreq, motorResolution);
   ledcSetup(motorBChannel, motorFreq, motorResolution);
