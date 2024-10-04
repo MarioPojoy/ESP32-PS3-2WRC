@@ -15,10 +15,54 @@
  
 #define motorAChannel   3
 #define motorBChannel   4
- 
+
+#define FORWARDS   1
+#define BACKWARDS  2
+#define TURN_RIGHT 3
+#define TURN_LEFT  4
+#define STOP  0
+
 int motorAPWM = 255;
 int motorBPWM = 255;
 int wheel = 0;
+
+void setMotorsDirection(int direction) {
+  switch (direction)
+  {
+  case 0:
+    digitalWrite(AIN1_PIN, LOW);
+    digitalWrite(AIN2_PIN, LOW);
+    digitalWrite(BIN1_PIN, LOW);
+    digitalWrite(BIN2_PIN, LOW);
+    break;
+  case 1:
+    digitalWrite(AIN1_PIN, LOW);
+    digitalWrite(AIN2_PIN, HIGH);
+    digitalWrite(BIN1_PIN, LOW);
+    digitalWrite(BIN2_PIN, HIGH);
+    break;
+  case 2:
+    digitalWrite(AIN1_PIN, HIGH);
+    digitalWrite(AIN2_PIN, LOW);
+    digitalWrite(BIN1_PIN, HIGH);
+    digitalWrite(BIN2_PIN, LOW);
+    break;
+  case 3:
+    digitalWrite(AIN1_PIN, HIGH);
+    digitalWrite(AIN2_PIN, LOW);
+    digitalWrite(BIN1_PIN, LOW);
+    digitalWrite(BIN2_PIN, HIGH);
+    break;
+  case 4:
+    digitalWrite(AIN1_PIN, LOW);
+    digitalWrite(AIN2_PIN, HIGH);
+    digitalWrite(BIN1_PIN, HIGH);
+    digitalWrite(BIN2_PIN, LOW);
+    break;
+  default:
+    break;
+  }
+}
 
 void setup()
 {
@@ -54,41 +98,23 @@ void loop() {
     wheel = 0;
     if((!Ps3.data.button.cross) && (!Ps3.data.button.square)){
       if(Ps3.data.button.left){
-        digitalWrite(AIN1_PIN, LOW);
-        digitalWrite(AIN2_PIN, HIGH);
-        digitalWrite(BIN1_PIN, HIGH);
-        digitalWrite(BIN2_PIN, LOW);
+        setMotorsDirection(TURN_LEFT);
       }
       if(Ps3.data.button.right){
-        digitalWrite(AIN1_PIN, HIGH);
-        digitalWrite(AIN2_PIN, LOW);
-        digitalWrite(BIN1_PIN, LOW);
-        digitalWrite(BIN2_PIN, HIGH);
+        setMotorsDirection(TURN_RIGHT);
       }
       if(Ps3.data.button.down){
-        digitalWrite(AIN1_PIN, HIGH);
-        digitalWrite(AIN2_PIN, LOW);
-        digitalWrite(BIN1_PIN, HIGH);
-        digitalWrite(BIN2_PIN, LOW);
+        setMotorsDirection(BACKWARDS);
       }
       if(Ps3.data.button.up){
-        digitalWrite(AIN1_PIN, LOW);
-        digitalWrite(AIN2_PIN, HIGH);
-        digitalWrite(BIN1_PIN, LOW);
-        digitalWrite(BIN2_PIN, HIGH);
+        setMotorsDirection(FORWARDS);
       }
       if ((!Ps3.data.button.left) && (!Ps3.data.button.right) && (!Ps3.data.button.down) && (!Ps3.data.button.up)){
-        digitalWrite(AIN1_PIN, LOW);
-        digitalWrite(AIN2_PIN, LOW);
-        digitalWrite(BIN1_PIN, LOW);
-        digitalWrite(BIN2_PIN, LOW);
+        setMotorsDirection(STOP);
       }
     }else {
       if((Ps3.data.button.cross) && (Ps3.data.button.square)){
-        digitalWrite(AIN1_PIN, LOW);
-        digitalWrite(AIN2_PIN, LOW);
-        digitalWrite(BIN1_PIN, LOW);
-        digitalWrite(BIN2_PIN, LOW);
+        setMotorsDirection(STOP);
       }else {
         wheel = map(Ps3.data.sensor.accelerometer.x, -112, 112, -255, 255);
         if(wheel > 20){
@@ -101,18 +127,11 @@ void loop() {
           motorAPWM = 255;
           motorBPWM = 255;
         }
-
         if(Ps3.data.button.cross){
-          digitalWrite(AIN1_PIN, LOW);
-          digitalWrite(AIN2_PIN, HIGH);
-          digitalWrite(BIN1_PIN, LOW);
-          digitalWrite(BIN2_PIN, HIGH);                        
+          setMotorsDirection(FORWARDS);                  
         }
         if(Ps3.data.button.square){
-          digitalWrite(AIN1_PIN, HIGH);
-          digitalWrite(AIN2_PIN, LOW);
-          digitalWrite(BIN1_PIN, HIGH);
-          digitalWrite(BIN2_PIN, LOW);
+          setMotorsDirection(BACKWARDS);
         }
       }
     }
@@ -125,6 +144,9 @@ void loop() {
     Serial.print(motorAPWM);
     Serial.print(" ");
     Serial.println(motorBPWM);
+  } else {
+    ledcWrite(motorAChannel, 0);
+    ledcWrite(motorBChannel, 0);
   }
   delay(10);
 }
